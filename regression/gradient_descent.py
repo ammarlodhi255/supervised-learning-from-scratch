@@ -76,8 +76,10 @@ class GradientDescentMultipleLR():
         bi = np.zeros(m)
 
         for i in range(iter):
-            wi[i], bi[i], dj_dw[i], dj_db[i] = self.update_weights(w, b)
-            costs[i] = self.cost(wi[-1], bi[-1])
+            wi[i], bi[i], dj_dw[i], dj_db[i] = self.update_weights(
+                wi[i-1], bi[i-1])
+            costs[i] = self.cost(wi[i], bi[i])
 
-        print(self.create_dataframe(np.arange(iter), costs, wi, bi, dj_dw, dj_db))
-        return wi[-1], bi[-1], costs
+        df = self.create_dataframe(
+            np.arange(iter), costs, wi, bi, dj_dw, dj_db)
+        return wi[-1], bi[-1], costs, df
