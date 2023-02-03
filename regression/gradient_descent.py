@@ -70,11 +70,12 @@ class GradientDescentMultipleLR():
         m = self.X.shape[0]
         n = self.X.shape[1]
         costs = np.zeros(iter)
-        dj_dw = np.zeros((m, n))
-        dj_db = np.zeros(m)
-        wi = np.zeros((m, n))
-        bi = np.zeros(m)
+        dj_dw = np.zeros((iter, n))
+        dj_db = np.zeros(iter)
+        wi = np.zeros((iter, n))
+        bi = np.zeros(iter)
 
+        i = 0
         for i in range(iter):
             wi[i], bi[i], dj_dw[i], dj_db[i] = self.update_weights(
                 wi[i-1], bi[i-1])
