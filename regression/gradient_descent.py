@@ -45,20 +45,25 @@ class GradientDescentMultipleLR():
         b = b - self.lr * dj_db
         return w, b, dj_dwi, dj_db
 
-    def create_dataframe(self, iteration, costs, djw, djb):
+    def create_dataframe(self, iteration, costs, w, b, djw, djb):
         data = []
         for i in range(len(iteration)):
             row = [iteration[i], costs[i], djb[i]]
-            row = np.concatenate([row[:2], djw[i], row[-1:]])
+            row = np.concatenate([row[:2], w[i], [b[i]], djw[i], row[-1:]])
             data.append(row)
 
         columns = ["iteration", "cost"]
+
+        for i in range(w.shape[1]):
+            columns.append(f'w{i}')
+
+        columns.append('b')
+
         for i in range(djw.shape[1]):
             columns.append(f'dj_dw{i}')
-        columns.append('dj_db')
 
-        df = pd.DataFrame(
-            data, columns)
+        columns.append('dj_db')
+        df = pd.DataFrame(data, columns=columns)
         return df
 
     def run(self, w, b, iter):
@@ -67,12 +72,12 @@ class GradientDescentMultipleLR():
         costs = np.zeros(iter)
         dj_dw = np.zeros((m, n))
         dj_db = np.zeros(m)
-
-        print(f'Initial Cost = {self.cost(w, b)}')
+        wi = np.zeros((m, n))
+        bi = np.zeros(m)
 
         for i in range(iter):
-            w, b, dj_dw[i], dj_db[i] = self.update_weights(w, b)
-            costs[i] = self.cost(w, b)
+            wi[i], bi[i], dj_dw[i], dj_db[i] = self.update_weights(w, b)
+            costs[i] = self.cost(wi[-1], bi[-1])
 
-        print(self.create_dataframe(np.arange(iter), costs, dj_dw, dj_db))
-        return w, b, costs
+        print(self.create_dataframe(np.arange(iter), costs, wi, bi, dj_dw, dj_db))
+        return wi[-1], bi[-1], costs
