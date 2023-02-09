@@ -84,3 +84,63 @@ class GradientDescentMultipleLR():
         df = self.create_dataframe(
             np.arange(iter), costs, wi, bi, dj_dw, dj_db)
         return wi[-1], bi[-1], costs, df
+
+
+class GradientDescentUnivariateLR():
+    def __init__(self, X, y, lr=0.015):
+        self.lr = lr
+        self.X = X
+        self.y = y
+        self.m = X.shape[0]
+
+    # Model representation
+    def f(self, x, w, b):
+        return w * x + b
+
+    # Compute output prediction for each input sample, given some choice for w & b
+
+    def compute_model_output(self, w, b):
+        f_wb = np.zeros(self.m)
+
+        for i in range(self.m):
+            f_wb[i] = self.f(self.X[i], w, b)
+
+        return f_wb
+
+    def compute_cost(self, w, b):
+        cost = self.compute_model_output(w, b) - self.y
+        cost_sum = np.sum(cost**2)
+        return (1 / (2 * self.m)) * cost_sum
+
+    def cost_derivative_w(self, w, b):
+        cost = self.compute_model_output(w, b) - self.y
+        dj_dw = 0
+        for i in range(self.X.shape[0]):
+            dj_dw += cost[i] * self.X[i]
+        dj_dw = dj_dw * (1 / self.m)
+        return dj_dw
+
+    def cost_derivative_b(self, w, b):
+        cost = self.compute_model_output(w, b) - self.y
+        dj_db = np.sum(cost)
+        dj_db = dj_db * (1 / self.m)
+        return dj_db
+
+    def update_weights(self, w, b):
+        tmp_w = w - self.lr * self.cost_derivative_w(w, b)
+        tmp_b = b - self.lr * self.cost_derivative_b(w, b)
+        w = tmp_w
+        b = tmp_b
+
+        return w, b
+
+    def run(self, w, b, iter):
+        cost = self.compute_cost(w, b)
+
+        for i in range(iter):
+            print(f'Current cost = {cost}')
+            w, b = self.update_weights(w, b)
+            cost = self.compute_cost(w, b)
+
+        print(f'\nFinal cost = {cost}')
+        return w, b
